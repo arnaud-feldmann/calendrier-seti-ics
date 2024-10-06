@@ -1,0 +1,35 @@
+name: Produire l'ICS et l'ICAL
+
+on:
+  push:
+    branches: [ "main" ]
+  schedule:
+    - cron:  "0 1 * * *"
+  workflow_dispatch:
+
+env:
+  RENV_PATHS_ROOT: ~/.cache/R/renv
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - uses: r-lib/actions/setup-r@v2
+    - uses: r-lib/actions/setup-renv@v2
+    - name: Lancer le script R
+      run: Rscript calendrier.R
+      
+    - name: Uploader l'ics
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Utilise le jeton GitHub pour l'authentification
+      run: |
+        git config --global user.name "GitHub Actions"
+        git config --global user.email "actions@github.com"
+        git checkout -b ics
+        git add -f edt.ics
+        git rm -rf .github/workflows .gitignore calendrier.R calendrier.Rproj renv.lock renv .Rprofile
+        git commit -m "Ajout ics"
+        git push --force origin ics
