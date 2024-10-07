@@ -41,13 +41,13 @@ library(stringr)
   mutate(Edt = str_replace_all(Edt, "(\r)?(\n)", " "),
          debut = format(with_tz(Date + hours(6L) + minutes(45L), "UTC"), "%Y%m%dT%H%M%SZ"),
          fin =  format(with_tz(Date + hours(15L) + minutes(30L), "UTC"), "%Y%m%dT%H%M%SZ"),
-         stamp = str_c("UID:", 1L:n(), "@uid.com")) %>%
+         stamp = format(with_tz(now(), "UTC"), "%Y%m%dT%H%M%SZ")) %>%
   mutate(Event = str_c(
     "BEGIN:VEVENT",
     str_c("UID:", 1L:n(), "@uid.com"),
-    str_c("DTSTART;TZID=UTC:", debut),
-    str_c("DTEND;TZID=UTC:", fin),
-    str_c("DTSTAMP;TZID=UTC:", stamp),
+    str_c("DTSTART:", debut),
+    str_c("DTEND:", fin),
+    str_c("DTSTAMP:", stamp),
     str_c("SUMMARY:", str_sub(Edt, 1L, 30L)),
     str_c("DESCRIPTION:", Edt),
     "END:VEVENT",
