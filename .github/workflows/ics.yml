@@ -35,5 +35,5 @@ jobs:
         git switch ics
         git checkout main -- edt.ics
         git add -f edt.ics
-        git commit -m "Ajout ics"
-        git push --allow-empty origin ics
+        git commit --allow-empty -m "Ajout ics"
+        git push origin ics
