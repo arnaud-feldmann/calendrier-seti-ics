@@ -34,5 +34,6 @@ jobs:
         git stash
         git checkout ics
         git stash pop
+        git add edt.ics
         git commit -m "Ajout ics"
         git push origin ics
