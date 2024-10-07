@@ -22,10 +22,6 @@ library(stringr)
               is.na(Jeudi) & is.na(Vendredi))) %>%
   fill(Date, .direction = "down") %>%
   mutate(Date = floor_date(as_datetime(round_date(Date, unit = "day"), tz = "Europe/Paris"), unit = "day")) %>%
-  group_by(Date) %>%
-  summarise(across(everything(),
-                   ~str_c(.x[!is.na(.x)], collapse = " || "))) %>%
-  ungroup() %>%
   pivot_longer(cols = c(Lundi, Mardi, Mercredi, Jeudi, Vendredi),
                names_to = "Jour",
                values_to = "Edt") %>%
@@ -55,7 +51,6 @@ library(stringr)
     str_c("DTEND:", fin),
     str_c("DTSTAMP:", stamp),
     str_c("SUMMARY:", Edt),
-    str_c("DESCRIPTION:", Edt),
     "END:VEVENT",
     sep = "\r\n")) %>%
   pull(Event) %>%
