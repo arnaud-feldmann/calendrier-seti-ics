@@ -33,7 +33,7 @@ library(stringr)
     Jour == "Vendredi" ~ Date + days(4L)
   )) %>%
   select(! Jour) %>%
-  mutate(match = str_match(Edt, "([0-9]{1,2})h([0-9]{0,2})\\s?[\\s/|-]\\s?([0-9]{1,2})h([0-9]{0,2})"),
+  mutate(match = str_match(Edt, "([0-9]{1,2})h([0-9]{0,2})\\s?[\\s/|\\-:]\\s?([0-9]{1,2})h([0-9]{0,2})"),
          heure_debut = hours(as.integer(match[,2L])) + minutes(replace_na(as.integer(match[,3L]), 0L)),
          heure_fin = hours(as.integer(match[,4L])) + minutes(replace_na(as.integer(match[,5L]), 0L))) %>%
   mutate(Edt = if_else(is.na(heure_debut) | is.na(heure_fin), str_c("[PAS D'HEURE] ", Edt), Edt)) %>%
