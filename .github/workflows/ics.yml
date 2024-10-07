@@ -31,9 +31,9 @@ jobs:
         git config --global user.name "GitHub Actions"
         git config --global user.email "actions@github.com"
         git add -f edt.ics
-        git stash
-        git checkout ics
-        git stash pop
-        git add edt.ics
+        git commit -m "commit"
+        git switch ics
+        git checkout main -- edt.ics
+        git add -f edt.ics
         git commit -m "Ajout ics"
         git push origin ics
