@@ -31,20 +31,23 @@ library(stringr)
                values_to = "Edt") %>%
   mutate(Date = case_when(
     Jour == "Lundi" ~ Date,
-    Jour == "Mardi" ~ Date + 1L,
-    Jour == "Mercredi" ~ Date + 2L,
-    Jour == "Jeudi" ~ Date + 3L,
-    Jour == "Vendredi" ~ Date + 4L
+    Jour == "Mardi" ~ Date + days(1L),
+    Jour == "Mercredi" ~ Date + days(2L),
+    Jour == "Jeudi" ~ Date + days(3L),
+    Jour == "Vendredi" ~ Date + days(4L)
   )) %>%
   select(! Jour) %>%
   filter(! is.na(Edt) & Edt != "") %>%
-  mutate(Edt = str_replace_all(Edt, "(\r)?(\n)", " ")) %>%
+  mutate(Edt = str_replace_all(Edt, "(\r)?(\n)", " "),
+         debut = format(with_tz(Date + hours(6L) + minutes(45L), "UTC"), "%Y%m%dT%H%M%SZ"),
+         fin =  format(with_tz(Date + hours(15L) + minutes(30L), "UTC"), "%Y%m%dT%H%M%SZ"),
+         stamp = str_c("UID:", 1L:n(), "@uid.com")) %>%
   mutate(Event = str_c(
     "BEGIN:VEVENT",
     str_c("UID:", 1L:n(), "@uid.com"),
-    str_c("DTSTART;TZID=UTC:", format(with_tz(Date + hours(6L) + minutes(45L), "UTC"), "%Y%m%dT%H%M%SZ")),
-    str_c("DTEND;TZID=UTC:", format(with_tz(Date + hours(15L) + minutes(30L), "UTC"), "%Y%m%dT%H%M%SZ")),
-    str_c("DTSTAMP;TZID=UTC:", format(with_tz(now(), "UTC"), "%Y%m%dT%H%M%SZ")),
+    str_c("DTSTART;TZID=UTC:", debut),
+    str_c("DTEND;TZID=UTC:", fin),
+    str_c("DTSTAMP;TZID=UTC:", stamp),
     str_c("SUMMARY:", str_sub(Edt, 1L, 30L)),
     str_c("DESCRIPTION:", Edt),
     "END:VEVENT",
