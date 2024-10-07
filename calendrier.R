@@ -54,7 +54,7 @@ library(stringr)
     str_c("DTSTART:", debut),
     str_c("DTEND:", fin),
     str_c("DTSTAMP:", stamp),
-    str_c("SUMMARY:", str_sub(Edt, 1L, 30L)),
+    str_c("SUMMARY:", Edt),
     str_c("DESCRIPTION:", Edt),
     "END:VEVENT",
     sep = "\r\n")) %>%
