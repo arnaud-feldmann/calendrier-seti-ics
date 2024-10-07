@@ -28,9 +28,7 @@ jobs:
       run: |
         git config --global user.name "GitHub Actions"
         git config --global user.email "actions@github.com"
-        git branch -d ics
-        git switch ics
+        git checkout ics
         git add -f edt.ics
-        git rm -rf .github/workflows .gitignore calendrier.R calendrier.Rproj renv.lock renv .Rprofile
         git commit -m "Ajout ics"
-        git push --force origin ics
+        git push origin ics
