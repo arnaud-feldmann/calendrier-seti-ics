@@ -21,7 +21,7 @@ library(stringr)
   filter(! (is.na(Lundi) & is.na(Mardi) & is.na(Mercredi) &
               is.na(Jeudi) & is.na(Vendredi))) %>%
   fill(Date, .direction = "down") %>%
-  mutate(Date = round_date(as_datetime(Date, tz = "Europe/Paris"), unit = "hour")) %>%
+  mutate(Date = floor_date(as_datetime(round_date(Date, unit = "day"), tz = "Europe/Paris"), unit = "day")) %>%
   group_by(Date) %>%
   summarise(across(everything(),
                    ~str_c(.x[!is.na(.x)], collapse = " || "))) %>%
@@ -37,10 +37,16 @@ library(stringr)
     Jour == "Vendredi" ~ Date + days(4L)
   )) %>%
   select(! Jour) %>%
+  mutate(match = str_match(Edt, "([0-9]{1,2})h([0-9]{0,2})\\s?[\\s/|-]\\s?([0-9]{1,2})h([0-9]{0,2})"),
+         heure_debut = hours(as.integer(match[,2L])) + minutes(replace_na(as.integer(match[,3L]), 0L)),
+         heure_fin = hours(as.integer(match[,4L])) + minutes(replace_na(as.integer(match[,5L]), 0L))) %>%
+  mutate(Edt = if_else(is.na(heure_debut) | is.na(heure_fin), str_c("[PAS D'HEURE] ", Edt), Edt)) %>%
+  mutate(heure_debut = replace_na(heure_debut, hours(8L) + minutes(45L)),
+         heure_fin = replace_na(heure_fin, hours(17L) + minutes(30L))) %>%
   filter(! is.na(Edt) & Edt != "") %>%
   mutate(Edt = str_replace_all(Edt, "(\r)?(\n)", " "),
-         debut = format(with_tz(Date + hours(6L) + minutes(45L), "UTC"), "%Y%m%dT%H%M%SZ"),
-         fin =  format(with_tz(Date + hours(15L) + minutes(30L), "UTC"), "%Y%m%dT%H%M%SZ"),
+         debut = format(with_tz(Date + heure_debut, "UTC"), "%Y%m%dT%H%M%SZ"),
+         fin =  format(with_tz(Date + heure_fin, "UTC"), "%Y%m%dT%H%M%SZ"),
          stamp = format(with_tz(now(), "UTC"), "%Y%m%dT%H%M%SZ")) %>%
   mutate(Event = str_c(
     "BEGIN:VEVENT",
